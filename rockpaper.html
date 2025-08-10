@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            background-color: #3a5a8a;
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #rock {
+            background-color: #ff6b6b;
+        }
+        
+        #paper {
+            background-color: #48dbfb;
+        }
+        
+        #scissors {
+            background-color: #1dd1a1;
+        }
+        
+        .score-board {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 300px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .score {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .result-message {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .win {
+            color: #2ecc71;
+        }
+        
+        .lose {
+            color: #e74c3c;
+        }
+        
+        .tie {
+            color: #f39c12;
+        }
+        
+        /* Animation classes */
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        .glow {
+            animation: glow 1.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px #f39c12; }
+            50% { box-shadow: 0 0 20px #f39c12; }
+        }
+        
+        /* Confetti styles */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: confetti 3s ease-in-out;
+            z-index: 0;
+        }
+        
+        @keyframes confetti {
+            0% { 
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Rock Paper Scissors</h1>
+    
+    <div class="buttons-container">
+        <button id="rock" onclick="playGame('Rock')">
+            Rock
+        </button>
+        <button id="paper" onclick="playGame('Paper')">
+            Paper
+        </button>
+        <button id="scissors" onclick="playGame('Scissors')">
+            Scissors
+        </button>
+    </div>
+    
+    <div class="score-board" id="score-board">
+        <div class="score">
+            <div>You: <span id="user-score">0</span></div>
+            <div>Computer: <span id="computer-score">0</span></div>
+        </div>
+        <div class="result-message" id="result-message">
+            Make your move!
+        </div>
+    </div>
+    
+    <script>
+        let userScore = 0;
+        let computerScore = 0;
+        const userScoreSpan = document.getElementById('user-score');
+        const computerScoreSpan = document.getElementById('computer-score');
+        const resultMessage = document.getElementById('result-message');
+        const scoreBoard = document.getElementById('score-board');
+        
+        function getComputerMove() {
+            const res = Math.random();
+            if (res < 1/3) return 'Rock';
+            else if (res < 2/3) return 'Paper';
+            else return 'Scissors';
+        }
+        
+        function determineWinner(userMove, computerMove) {
+            if (userMove === computerMove) return 'tie';
+            
+            if ((userMove === 'Rock' && computerMove === 'Scissors') ||
+                (userMove === 'Paper' && computerMove === 'Rock') ||
+                (userMove === 'Scissors' && computerMove === 'Paper')) {
+                return 'win';
+            }
+            
+            return 'lose';
+        }
+        
+        function updateScore(result) {
+            if (result === 'win') {
+                userScore++;
+                userScoreSpan.textContent = userScore;
+            } else if (result === 'lose') {
+                computerScore++;
+                computerScoreSpan.textContent = computerScore;
+            }
+        }
+        
+        function createConfetti() {
+            const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+                
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+        
+        function playGame(userMove) {
+            const computerMove = getComputerMove();
+            const result = determineWinner(userMove, computerMove);
+            
+            updateScore(result);
+            
+            // Clear previous animations
+            scoreBoard.classList.remove('shake', 'glow');
+            
+            // Update result message and apply effects
+            let message = `You picked ${userMove}. Computer picked ${computerMove}. `;
+            
+            if (result === 'win') {
+                message += "You win!";
+                resultMessage.className = "result-message win";
+                createConfetti();
+            } else if (result === 'lose') {
+                message += "You lose!";
+                resultMessage.className = "result-message lose";
+                scoreBoard.classList.add('shake');
+            } else {
+                message += "It's a tie!";
+                resultMessage.className = "result-message tie";
+                scoreBoard.classList.add('glow');
+            }
+            
+            resultMessage.textContent = message;
+            
+            // Button press animation
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.style.transform = 'translateY(0)';
+            });
+            event.target.style.transform = 'translateY(5px)';
+        }
+    </script>
+</body>
+</html>
